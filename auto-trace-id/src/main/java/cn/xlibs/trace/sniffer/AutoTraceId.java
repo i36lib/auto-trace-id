@@ -37,6 +37,6 @@ public final class AutoTraceId {
                     "for intercepting to narrow the enhanced scope and speed up the startup. e.g: \n" +
                     "-javaagent:/dir/to/auto-trace-id.jar=com.example.package,org.example.package");
         }
-        TraceBuilder.intercept(packagePrefixes).on(instrument);
+        TraceBuilder.intercept(packagePrefixes).withPrimarySource(AutoTraceId.class).on(instrument);
     }
 }

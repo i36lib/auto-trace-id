@@ -2,121 +2,147 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <!-- NO  parent here -->
-
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>cn.xlibs.trace</groupId>
-    <artifactId>auto-trace-id</artifactId>
+    <artifactId>auto-trace-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>Auto Trace ID (Parent)</name>
+    <url>https://github.com/i36lib/auto-trace-id</url>
+    <description>
+        Auto Trace ID is a Java Agent for auto intercept common assembly to set traceId.
+    </description>
 
     <properties>
-        <premain.class>cn.xlibs.trace.sniffer.AutoTraceId</premain.class>
-        <buddy.shaded.patten>cn.xlibs.trace.sniffer.jar.bytebuddy</buddy.shaded.patten>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.8</java.version>
+        <file.encoding>UTF-8</file.encoding>
+
+        <project.build.sourceEncoding>${file.encoding}</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>${file.encoding}</project.reporting.outputEncoding>
+
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <maven-compiler.version>3.1</maven-compiler.version>
+        <maven-jar.version>2.3.2</maven-jar.version>
+        <maven-shade.version>3.3.0</maven-shade.version>
+        <exec-maven.version>1.6.0</exec-maven.version>
+
+        <nexus.url>https://oss.sonatype.org</nexus.url>
+        <version.plugin.staging>1.6.8</version.plugin.staging>
+
+        <bytebuddy.version>1.11.18</bytebuddy.version>
+        <spring.version>5.1.4.RELEASE</spring.version>
+        <spring-boot.version>2.1.2.RELEASE</spring-boot.version>
+
+        <auto-trace-ctx.version>1.0.0-SNAPSHOT</auto-trace-ctx.version>
+        <auto-trace-id.version>1.0.0-SNAPSHOT</auto-trace-id.version>
+        <auto-trace-spring.version>1.0.0-SNAPSHOT</auto-trace-spring.version>
+
+        <repository.url>git@github.com:i36lib/auto-trace-id.git</repository.url>
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>net.bytebuddy</groupId>
-            <artifactId>byte-buddy</artifactId>
-            <version>1.11.18</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.bytebuddy</groupId>
-            <artifactId>byte-buddy-agent</artifactId>
-            <version>1.11.18</version>
-            <scope>compile</scope>
-        </dependency>
-    </dependencies>
+    <modules>
+        <module>auto-trace-ctx</module>
+        <module>auto-trace-id</module>
+        <module>auto-trace-spring</module>
+    </modules>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+            <comments>A business-friendly OSS license</comments>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>i36lib</id>
+            <name>阿北</name>
+            <email>i36.lib@gmail.com</email>
+            <url>https://github.com/i36lib</url>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>+8</timezone>
+        </developer>
+    </developers>
+
+    <issueManagement>
+        <system>github.com</system>
+        <url>https://github.com/i36lib/auto-trace-id/issues</url>
+    </issueManagement>
+
+    <scm>
+        <connection>scm:git:${repository.url}</connection>
+        <developerConnection>scm:git:${repository.url}</developerConnection>
+        <url>${repository.url}</url>
+        <tag>auto-trace-id-1.0.0</tag>
+    </scm>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- byte buddy -->
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>${bytebuddy.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy-agent</artifactId>
+                <version>${bytebuddy.version}</version>
+            </dependency>
+
+            <!-- spring support -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+
+            <!-- spring boot support -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-autoconfigure</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
-        <finalName>auto-trace-id</finalName>
         <plugins>
+            <!-- Setup plugin for deployment to Maven Central. -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.3.2</version>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>${version.plugin.staging}</version>
+                <extensions>true</extensions>
                 <configuration>
-                    <archive>
-                        <index>true</index>
-                        <manifestEntries>
-                            <Can-Retransform-Classes>true</Can-Retransform-Classes>
-                            <Premain-Class>${premain.class}</Premain-Class>
-                        </manifestEntries>
-                    </archive>
+                    <serverId>central</serverId>
+                    <nexusUrl>${nexus.url}</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                    <encoding>UTF-8</encoding>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.3.0</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <shadedArtifactAttached>false</shadedArtifactAttached>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <createSourcesJar>false</createSourcesJar>
-                            <shadeSourcesContent>false</shadeSourcesContent>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <manifestEntries>
-                                        <Agent-Class>${premain.class}</Agent-Class>
-                                        <Premain-Class>${premain.class}</Premain-Class>
-                                    </manifestEntries>
-                                </transformer>
-                            </transformers>
-                            <artifactSet>
-                                <includes>
-                                    <include>net.bytebuddy:byte-buddy:jar:</include>
-                                    <include>net.bytebuddy:byte-buddy-agent:jar:</include>
-                                </includes>
-                            </artifactSet>
-                            <relocations>
-                                <relocation>
-                                    <pattern>net.bytebuddy</pattern>
-                                    <shadedPattern>${buddy.shaded.patten}</shadedPattern>
-                                </relocation>
-                            </relocations>
-                            <filters>
-                                <filter>
-                                    <artifact>net.bytebuddy:byte-buddy-agent</artifact>
-                                    <excludes>
-                                        <exclude>META-INF/*.MF</exclude>
-                                        <exclude>META-INF/LICENSE</exclude>
-                                        <exclude>META-INF/NOTICE</exclude>
-                                        <exclude>META-INF/versions/9/module-info.class</exclude>
-                                    </excludes>
-                                </filter>
-                                <filter>
-                                    <artifact>net.bytebuddy:byte-buddy</artifact>
-                                    <excludes>
-                                        <exclude>META-INF/*.MF</exclude>
-                                        <exclude>META-INF/LICENSE</exclude>
-                                        <exclude>META-INF/NOTICE</exclude>
-                                        <exclude>META-INF/versions/9/module-info.class</exclude>
-                                    </excludes>
-                                </filter>
-                            </filters>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
+
+<!--    <distributionManagement>-->
+<!--        <snapshotRepository>-->
+<!--            <id>central</id>-->
+<!--            <url>${nexus.url}/content/repositories/snapshots</url>-->
+<!--        </snapshotRepository>-->
+<!--        <repository>-->
+<!--            <id>central</id>-->
+<!--            <url>${nexus.url}/service/local/staging/deploy/maven2</url>-->
+<!--        </repository>-->
+<!--    </distributionManagement>-->
 </project>

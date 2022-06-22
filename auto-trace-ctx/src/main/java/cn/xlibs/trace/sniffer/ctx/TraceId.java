@@ -1,6 +1,4 @@
-package cn.xlibs.trace.sniffer.context;
-
-import cn.xlibs.trace.sniffer.support.Define;
+package cn.xlibs.trace.sniffer.ctx;
 
 import java.util.UUID;
 
@@ -51,6 +49,6 @@ public final class TraceId {
         return UUID.randomUUID()
                 .toString()
                 .substring(18)
-                .replace(Define.HYPHEN, Define.EMPTY_STRING);
+                .replace("-", "");
     }
 }

@@ -1,6 +1,4 @@
-package cn.xlibs.trace.sniffer.support;
-
-import cn.xlibs.trace.sniffer.context.TraceId;
+package cn.xlibs.trace.sniffer.ctx;
 
 import java.util.Objects;
 
