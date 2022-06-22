@@ -2,6 +2,8 @@ package cn.xlibs.trace.spring;
 
 import cn.xlibs.trace.sniffer.support.TraceBuilder;
 import cn.xlibs.trace.spring.support.SpringSupport;
+
+import java.lang.instrument.Instrumentation;
 import java.lang.management.ManagementFactory;
 import java.util.Arrays;
 import java.util.List;
@@ -72,8 +74,8 @@ public final class AutoTrace {
                 }
 
                 final String packagePrefixes = SpringSupport.getInterceptPackagePrefixes(primarySource);
-
-                TraceBuilder.intercept(packagePrefixes).on(primarySource, TraceBuilder.getInstrumentation());
+                final Instrumentation instrument = TraceBuilder.getInstrumentation();
+                TraceBuilder.intercept(packagePrefixes).withPrimarySource(primarySource).on(instrument);
             } catch (Throwable e) {
                 System.err.println("Failed to register auto trace id hook: " + e.getMessage());
                 e.printStackTrace();
